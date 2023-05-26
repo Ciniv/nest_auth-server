@@ -14,6 +14,7 @@ import { User } from './user/user.entity';
       entities: [User],
       synchronize: true,
     }),
+    TypeOrmModule.forFeature([User])
   ],
   controllers: [UserController],
   providers: [UserService],
