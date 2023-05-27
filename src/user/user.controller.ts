@@ -1,6 +1,7 @@
-import { Body, Controller, Get, NotFoundException, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, Patch, Post } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dtos/create-user.dto';
+import { UpdateUserDto } from './dtos/update-user.dto';
 
 @Controller('auth')
 export class UserController {
@@ -21,5 +22,10 @@ export class UserController {
             throw new NotFoundException();
         }
         return user;
+    }
+
+    @Patch('/:id')
+    async updateUser(@Param('id') id: string, @Body() body: UpdateUserDto){
+        return await this.userService.updateUser(parseInt(id), body);
     }
 }
