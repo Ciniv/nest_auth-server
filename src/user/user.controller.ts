@@ -1,4 +1,4 @@
-import { Body, Controller, Get, NotFoundException, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
@@ -10,7 +10,7 @@ export class UserController {
         private readonly userService: UserService
     ){}
 
-    @Post()
+    @Post('/signup')
     async saveUser (@Body() body: CreateUserDto) {
         return await this.userService.saveUser(body.email, body.password);
     }
@@ -27,5 +27,10 @@ export class UserController {
     @Patch('/:id')
     async updateUser(@Param('id') id: string, @Body() body: UpdateUserDto){
         return await this.userService.updateUser(parseInt(id), body);
+    }
+
+    @Delete('/:id')
+    async removeUser(@Param('id') id: string) {
+        return await this.userService.removeUser(parseInt(id));
     }
 }
