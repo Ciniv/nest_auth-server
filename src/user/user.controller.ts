@@ -2,8 +2,11 @@ import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post } 
 import { UserService } from './user.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
+import { UserDto } from './dtos/user.dto';
+import { Interceptor } from '../interceptors/custom.interceptor';
 
 @Controller('auth')
+@Interceptor(UserDto)
 export class UserController {
 
     constructor(
