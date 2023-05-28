@@ -10,9 +10,13 @@ export class UserService {
         @InjectRepository(User) private userRepo: Repository<User>
     ){}
 
-    async saveUser(email: string, password: string) {
+    async create(email: string, password: string) {
         const user = this.userRepo.create({email, password})
         return this.userRepo.save(user);
+    }
+
+    async findUserByEmail(email: string) {
+        return await this.userRepo.findOne({where:{email:email}});
     }
 
     async findUserById(id: number){
