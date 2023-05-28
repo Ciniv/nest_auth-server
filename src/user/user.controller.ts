@@ -1,10 +1,24 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Delete,
+    Get,
+    NotFoundException,
+    Param,
+    Patch,
+    Post,
+    Session,
+    UseGuards,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UserDto } from './dtos/user.dto';
 import { Interceptor } from '../interceptors/custom.interceptor';
 import { AuthService } from './auth.service';
+import { CurrentUser } from './decorators/user.decorator';
+import { User } from './user.entity';
+import { authGuard } from '../guards/auth.guard';
 
 @Controller('auth')
 @Interceptor(UserDto)
@@ -15,19 +29,30 @@ export class UserController {
         private readonly authService: AuthService,
     ){}
 
+    @Get('/whoami')
+    @UseGuards(authGuard)
+    whoAmI(@CurrentUser() user: User){
+        return user;
+    }
+
+
     @Post('/signup')
-    async signup (@Body() body: CreateUserDto) {
-        return await this.authService.signup(body.email, body.password);
+    async signUp (@Body() body: CreateUserDto, @Session() session: any) {
+        const user = await this.authService.signup(body.email, body.password);
+        session.userId = user.id
+        return user;
     }
 
     @Post('/signin')
-    async signin (@Body() body: CreateUserDto) {
-        return await this.authService.signin(body.email, body.password);
+    async signIn (@Body() body: CreateUserDto, @Session() session: any) {
+        const user = await this.authService.signin(body.email, body.password);
+        session.userId = user.id
+        return user;
     }
 
     @Post('/signout')
-    async signout (@Body() body: CreateUserDto) {
-        return await this.authService.signout(body.email, body.password);
+    async signOut (@Session() session: any) {
+        session.userId = null;
     }
 
     @Get('/:id')
