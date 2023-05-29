@@ -14,10 +14,9 @@ export class AuthService{
 
     async signup(email: string, password: string) {
 
-        const user = this.userService.findUserByEmail(email);
-
-        if(!user){
-            throw new NotFoundException();
+        const user = await this.userService.findUserByEmail(email);
+        if(user){
+            throw new BadRequestException();
         }
         //gera o salt
         const salt = randomBytes(8).toString('hex');
@@ -29,7 +28,7 @@ export class AuthService{
         return await this.userService.create(email,result);
     }
 
-    
+
     async signin(email: string, password: string) {
         const user = await this.userService.findUserByEmail(email);
         if(!user){
@@ -45,7 +44,4 @@ export class AuthService{
         return user;
     }
 
-    async signout(email: string, password: string) {
-        
-    }
 }
