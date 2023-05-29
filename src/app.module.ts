@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
 import { UserController } from './user/user.controller';
 import { UserService } from './user/user.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { User } from './user/user.entity';
 import { UsersModule } from './user/user.module';
 import { AuthService } from './user/auth.service';
+import { APP_PIPE } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -19,6 +20,15 @@ import { AuthService } from './user/auth.service';
     UsersModule,
   ],
   controllers: [UserController],
-  providers: [UserService, AuthService],
+  providers: [
+    UserService,
+    AuthService,
+    {
+      provide: APP_PIPE,
+      useValue: new ValidationPipe({
+        whitelist: true,
+      })
+    }
+  ],
 })
 export class AppModule {}

@@ -8,9 +8,6 @@ async function bootstrap() {
   app.use(cookieSession({
     keys: ['abcde']
   }))
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,
-  }));
   await app.listen(3000);
 }
 bootstrap();
