@@ -2,7 +2,7 @@ import { Module, ValidationPipe, MiddlewareConsumer } from '@nestjs/common';
 import { UserController } from './user/user.controller';
 import { UserService } from './user/user.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { User } from './user/user.entity';
 import { UsersModule } from './user/user.module';
 import { AuthService } from './user/auth.service';
@@ -11,12 +11,20 @@ const cookieSession = require('cookie-session');
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      url: process.env.POSTGRES_URL,
-      entities: [User],
-      synchronize: true,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      // envFilePath: `.env.${process.env.NODE_ENV}`,
+    }),
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => {
+        return {
+          type: 'postgres',
+          url: config.get<string>('POSTGRES_URL'),
+          synchronize: true,
+          entities: [User],
+        };
+      },
     }),
     UsersModule,
   ],
@@ -33,10 +41,13 @@ const cookieSession = require('cookie-session');
   ],
 })
 export class AppModule {
+
+  constructor(private config: ConfigService){}
+
   configure(consumer: MiddlewareConsumer){
     consumer.apply(
       cookieSession({
-        keys: ['abcde']
+        keys: [this.config.get<string>('COOKIE_KEY')]
       })
     ).forRoutes('*');
   }
